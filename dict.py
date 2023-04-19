@@ -1,17 +1,16 @@
 from collections import defaultdict
 import os
 
+image_dict = defaultdict(list)
 
-def get_image_dict(folder):
+def build_image_dict(folder):
     day = folder[-1]
-    image_dict = defaultdict(list)
     for root, dirs, files in os.walk(folder):
         for file in files:
             if file.endswith(".JPG"):
                 image_dict[day + file[:-4]].append(os.path.join(root, file))
 
+def get_image_dict():
     return image_dict
-
-print(get_image_dict("Day1").keys())
 
 
