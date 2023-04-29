@@ -1,2 +1,2 @@
-def kiwi_score():
+def kiwi_score(path):
     pass
