@@ -26,7 +26,7 @@ def apple_score(path, LOW, UP):
     return score
 
 
-banana_score('Day7/apple2.JPG', LOW, UP)
+apple_score('Day7/apple2.JPG', LOW, UP)
 
 
 
