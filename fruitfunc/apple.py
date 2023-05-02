@@ -1,6 +1,8 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+import random
+
 
 from general import blemishes_score, background_to_white, process_image
 
