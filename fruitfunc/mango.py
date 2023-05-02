@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from general import blemishes_score, background_to_white, process_image
 
-
+# update blemish values
 LOW = np.array([10, 100, 10])
 UP = np.array([16, 255, 255])
 
@@ -23,7 +23,13 @@ def mango_score(path, LOW, UP):
     img = background_to_white(img)
 
     # get blemish score
-    score += blemishes_score(img, LOW, UP)
+    blemish_score += blemishes_score(img, LOW, UP)
+    rgb_score = rgb(path)
+    hue_score = hue(path)
+
+
+    # return a weighted average of the scores
+    score = (blemish_score * 0.5) + (rgb_score * 0.3) + (hue_score * 0.2)
 
     return score
 
@@ -73,7 +79,7 @@ def rgb(path):
     # plt.show()
 
 
-def hue():
+def hsv():
     img = cv2.imread('/Users/jay/Desktop/Project Fruit/Day1/mango2.JPG')
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -111,6 +117,126 @@ def hue():
 
     print(f'Ripeness score: {ripeness_score:.2f}')
 
+# need to not include border of image in the count
+# need to apply minimal processing to the image to reduce noise but not remove wrinkles
+def wrinkles2(img_path):
+    img = cv2.imread(img_path)
+
+    kernel = np.ones((3, 3), np.uint8)
+
+    #img = cv2.erode(img,kernel,iterations = 1)
+    # apply gaussian blur to reduce noise
+    img = cv2.GaussianBlur(img, (5, 5), 1)
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # ww can use canny edge detection to identify edges
+    edges1 = cv2.Canny(gray, 10, 100)
+    edges2 = cv2.Canny(gray, 170, 200)
+    edges = cv2.subtract(edges1, edges2)
+
+    dilated = cv2.dilate(edges, kernel, iterations=1)
+
+    # create a binary mask
+    _, thresh = cv2.threshold(dilated, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+
+    # create ripeness score based on the number of wrinkles
+    num_wrinkles = cv2.countNonZero(thresh)
+    max_wrinkles = 5000  # Set a maximum number of wrinkles for a fully ripe fruit
+    ripeness_score = min(1, num_wrinkles / max_wrinkles)
+
+    # Display the results
+    cv2.imshow('Original', img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    cv2.imshow('Edges', edges)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    cv2.imshow('Dilated', dilated)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    cv2.imshow('Mask', thresh)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    print(f'Number of wrinkles: {num_wrinkles}')
+    print(f'Ripeness score: {ripeness_score:.2f}')
+
+
+def wrinkles(path):
+
+    img = cv2.imread(path)
+
+
+    #img = cv2.erode(img,kernel,iterations = 1)
+    # apply gaussian blur to reduce noise
+    img = cv2.GaussianBlur(img, (5, 5), 1)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    edges1 = cv2.Canny(gray, 20, 100)
+
+    cv2.imshow('Original', img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    cv2.imshow('Edges1', edges1)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    # Threshold the image to create a binary mask
+    _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (8,8))
+    mask = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
+
+
+    # dilate the mask
+    # kernel = np.ones((3, 3), np.uint8)
+    # mask = cv2.dilate(mask, kernel, iterations=1)
+
+
+
+    edges1 = np.array(edges1)
+    mask = np.array(mask)
+
+
+    # Set elements of edges to zero where edges2 is nonzero
+    edges1[mask != 0] = 0
+
+    edges = edges1
+
+    kernel = np.ones((3, 3), np.uint8)
+    dilated = cv2.dilate(edges, kernel, iterations=1)
+
+    # create a binary mask
+    _, thresh = cv2.threshold(dilated, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+
+    # create ripeness score based on the number of wrinkles
+    num_wrinkles = cv2.countNonZero(thresh)
+    max_wrinkles = 5000  # Set a maximum number of wrinkles for a fully ripe fruit
+    ripeness_score = min(1, num_wrinkles / max_wrinkles)
+
+    # Display the results
+
+    cv2.imshow('Mask', mask)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    cv2.imshow('Edges', edges)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    cv2.imshow('Thres', thresh)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    print(f'Number of wrinkles: {num_wrinkles}')
+    print(f'Ripeness score: {ripeness_score:.2f}')
+
+
+
+
+
+
 
 # # iterate through all images by iterating the day number in the path
 # # path = '/Users/jay/Desktop/Project Fruit/Day1/mango2.JPG'
@@ -121,5 +247,7 @@ def hue():
 
 #hue()
 
-mango_score('Day7/mango2.JPG', LOW, UP)
+#mango_score('Day7/mango2.JPG', LOW, UP)
+wrinkles('/Users/jay/Desktop/Project Fruit/Day1/mango3.JPG')
+
 
