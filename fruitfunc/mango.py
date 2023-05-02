@@ -9,12 +9,13 @@ from general import blemishes_score, background_to_white, process_image
 LOW = np.array([10, 100, 10])
 UP = np.array([16, 255, 255])
 
-def mango_score(path, LOW, UP):
+def mango_score(path):
 
     score = 0
 
     # read image
     img = cv2.imread('/Users/jay/Desktop/Project Fruit/' + path)
+    hsv_score = hsv(img)
 
     # process image
     img = process_image(img)
@@ -23,26 +24,18 @@ def mango_score(path, LOW, UP):
     img = background_to_white(img)
 
     # get blemish score
-    blemish_score += blemishes_score(img, LOW, UP)
-    rgb_score = rgb(path)
-    hue_score = hue(path)
+    #blemish_score += blemishes_score(img, LOW, UP)
+    rgb_score = rgb(img)
 
 
     # return a weighted average of the scores
-    score = (blemish_score * 0.5) + (rgb_score * 0.3) + (hue_score * 0.2)
+    # score = (blemish_score * 0.5) + (rgb_score * 0.3) + (hue_score * 0.2)
 
-    return score
+    return (rgb_score + hsv_score) / 2
 
 
 
-def rgb(path):
-    img = cv2.imread(path)
-
-    # process image
-    img = process_image(img)
-
-    # convert background to white
-    img = background_to_white(img)
+def rgb(img):
 
     r, g, b = cv2.split(img)
 
@@ -78,9 +71,10 @@ def rgb(path):
     # plt.ylabel('Frequency')
     # plt.show()
 
+    return avg_ratio
 
-def hsv():
-    img = cv2.imread('/Users/jay/Desktop/Project Fruit/Day1/mango2.JPG')
+
+def hsv(img):
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
@@ -93,14 +87,14 @@ def hsv():
     green_mask = cv2.inRange(hsv, green_lower, green_upper)
     yellow_mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
 
-    # display images in masks but when displaying images show in color
-    cv2.imshow('green mask', cv2.bitwise_and(img, img, mask=green_mask))
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # # display images in masks but when displaying images show in color
+    # cv2.imshow('green mask', cv2.bitwise_and(img, img, mask=green_mask))
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
-    cv2.imshow('yellow mask', cv2.bitwise_and(img, img, mask=yellow_mask))
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow('yellow mask', cv2.bitwise_and(img, img, mask=yellow_mask))
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     green_pixels = cv2.countNonZero(green_mask)
     yellow_pixels = cv2.countNonZero(yellow_mask)
@@ -115,7 +109,9 @@ def hsv():
     ripeness_score = max(0, ripeness_score)
     ripeness_score = min(1, ripeness_score)
 
-    print(f'Ripeness score: {ripeness_score:.2f}')
+    #print(f'Ripeness score: {ripeness_score:.2f}')
+
+    return ripeness_score
 
 # need to not include border of image in the count
 # need to apply minimal processing to the image to reduce noise but not remove wrinkles
@@ -238,16 +234,16 @@ def wrinkles(path):
 
 
 
-# # iterate through all images by iterating the day number in the path
-# # path = '/Users/jay/Desktop/Project Fruit/Day1/mango2.JPG'
-# for i in range(1, 6):
-#     path = f'/Users/jay/Desktop/Project Fruit/Day{i}/mango2.JPG'
-#     mango_score(path)
-#     print()
+# iterate through all images by iterating the day number in the path
+# path = '/Users/jay/Desktop/Project Fruit/Day1/mango2.JPG'
+for i in range(1, 11):
+    path = f'Day{i}/mango2.JPG'
+    mango_score(path)
+    print()
 
 #hue()
 
 #mango_score('Day7/mango2.JPG', LOW, UP)
-wrinkles('/Users/jay/Desktop/Project Fruit/Day1/mango3.JPG')
+#wrinkles('/Users/jay/Desktop/Project Fruit/Day1/mango3.JPG')
 
 
