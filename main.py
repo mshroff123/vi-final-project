@@ -9,6 +9,33 @@ from dict import get_image_dict, get_scores_dict
 from canvas import get_canvas
 
 
+def get_crowd_data(file_path):
+    crowd_dict = defaultdict()
+    with open(file_path, mode='r') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        headers = next(csv_reader)
+        for column in headers[1:]:
+            fruit_type, number = column.split('_')
+            day = int((int(number) - 13) / 2)
+            days_list = []
+            score_list = []
+            csv_file.seek(0)  # move file pointer back to beginning of file
+            next(csv_reader)
+            for row in csv_reader:
+                row = row[1:]
+                days, score = row[headers.index(column)].split(' ')
+                days_list.append(int(days))
+                score_list.append(float(score))
+
+            avg_score = round((sum(score_list))/6, 2)
+            avg_days = round((sum(days_list))/6)
+            print(avg_score, avg_days)
+            key = str(day) + fruit_type + "3"
+            crowd_dict[key] = {"days": avg_days, "ripeness": avg_score}
+
+    print(crowd_dict)
+    return crowd_dict
+
 def train(mock_dict):
     fruits = defaultdict(list)
     for key, value in mock_dict.items():
