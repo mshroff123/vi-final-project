@@ -10,6 +10,16 @@ from canvas import get_canvas
 
 
 def get_crowd_data(file_path):
+    total_fruits = 360
+    each_fruit = 60
+    general_accuracy = 0
+    apple_accuracy = 0
+    banana_accuracy = 0
+    kiwi_accuracy = 0
+    mango_accuracy = 0
+    orange_accuracy = 0
+    pear_accuracy = 0
+
     crowd_dict = defaultdict()
     with open(file_path, mode='r') as csv_file:
         csv_reader = csv.reader(csv_file)
@@ -19,22 +29,45 @@ def get_crowd_data(file_path):
             day = int((int(number) - 13) / 2)
             days_list = []
             score_list = []
-            csv_file.seek(0)    # move file pointer back to beginning of file
+            csv_file.seek(0) # move file pointer back to beginning of file
             next(csv_reader)
             for row in csv_reader:
                 row = row[1:]
                 days, score = row[headers.index(column)].split(' ')
                 days_list.append(int(days))
                 score_list.append(float(score))
+                if day == int(days):
+                    print("yes")
+                    general_accuracy += 1
+                    if fruit_type == "apple":
+                        apple_accuracy += 1
+                    elif fruit_type == "banana":
+                        banana_accuracy += 1
+                    elif fruit_type == "kiwi":
+                        kiwi_accuracy += 1
+                    elif fruit_type == "mango":
+                        mango_accuracy += 1
+                    elif fruit_type == "orange":
+                        orange_accuracy += 1
+                    else:
+                        pear_accuracy += 1
 
             avg_score = round((sum(score_list))/6, 2)
-            avg_days = round((sum(days_list))/6)
-            print(avg_score, avg_days)
-            key = str(day) + fruit_type + "3"
-            crowd_dict[key] = {"days": avg_days, "ripeness": avg_score}
+            avg_day = round((sum(days_list))/6)
+            key = str(days) + fruit_type + "3"
+            crowd_dict[key] = {"days": avg_day, "ripeness": avg_score}
+
+    # print(f'Banana Crowd Accuracy: {banana_accuracy/each_fruit:.4f}')
+    # print(f'Mango Crowd Accuracy: {mango_accuracy/each_fruit:.4f}')
+    # print(f'Apple Crowd Accuracy: {apple_accuracy/each_fruit:.4f}')
+    # print(f'Pear Crowd Accuracy: {pear_accuracy/each_fruit:.4f}')
+    # print(f'Orange Crowd Accuracy: {orange_accuracy/each_fruit:.4f}')
+    # print(f'Kiwi Crowd Accuracy: {kiwi_accuracy/each_fruit:.4f}')
+    # print(f'Overall Crowd Accuracy: {general_accuracy/total_fruits:.4f}')
 
     print(crowd_dict)
     return crowd_dict
+
 
 def train(mock_dict):
     fruits = defaultdict(list)
@@ -109,8 +142,14 @@ def test(fruit_lines, mock_dict):
                     day = int(key[0:2])
                 else:
                     day = int(key[0])
+                avg_value = avg_slope * day + avg_intercept
                 dist = abs(value - (avg_slope * day + avg_intercept))
                 total_distance += dist
+                # if value is less than the average line, plot a green line
+                if value < avg_slope * day + avg_intercept:
+                    ax.axvline(x=day, ymin=value, ymax=value, color='red', linestyle='--')
+
+
                 ax.axvline(x=day, ymin=0, ymax=value, color='red', linestyle='--')
 
         ax.set_xlabel('Days')
@@ -124,48 +163,12 @@ def test(fruit_lines, mock_dict):
 
 
 
-
-
-
 img_dict = get_image_dict()
 score_dict = get_scores_dict(img_dict)
-
-
-
-
-#get_canvas(img_dict, 'mango')
-
-# # Create an empty dictionary to store the updated entries
-# score_dict = defaultdict(list)
-
-# # Loop through each key-value pair in the original dictionary
-# for key, value in score_dict_old.items():
-#     # If the key starts with 0, update the key with 10 and add the entry to the new dictionary
-#     if key.startswith('0'):
-#         score_dict['10' + key[1:]] = value
-#     # If the key does not start with 0, add the entry to the new dictionary as is
-#     else:
-#         score_dict[key] = value
-
-
-
-
-mock_dict = {}
-
-# for day in range(1, 11):
-#     for number in range(1, 3):
-#         for fruit in ["apple", "banana", "kiwi", "mango", "pear"]:
-#             key = f"{day}{fruit}{number}"
-#             base_value = day / 5  # closer to 1 as the day gets higher, closer to 0 as the day gets lower
-#             random_offset = random.uniform(-0.05, 0.05)  # some level of randomness
-#             value = max(0, min(1, base_value + random_offset))
-#             mock_dict[key] = round(value, 2)
-
+crowd_dict = get_crowd_data("fruitcsv.csv")
 
 
 lines = train(score_dict)
 total_distance = test(lines, score_dict)
 
 
-# total_distance = calculate_vertical_distance(mock_dict, lines)
-# print(f'Total vertical distance for each fruit across all days: {total_distance}')
