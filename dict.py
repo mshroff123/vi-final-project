@@ -42,21 +42,43 @@ def get_image_dict():
 # specfically the fruit type will determine which function to call
 def get_scores_dict(images_dict):
     for key in images_dict:
-        if key[1] == 'a':
-            scores_dict[key] = apple_score(images_dict[key][0])
-        elif key[1] == 'b':
-            scores_dict[key] = banana_score(images_dict[key][0])
-        elif key[1] == 'o':
-            continue
-            scores_dict[key] = orange_score(images_dict[key])
-        elif key[1] == 'p':
-            scores_dict[key] = pear_score(images_dict[key][0])
-        elif key[1] == 'm':
-            scores_dict[key] = mango_score(images_dict[key][0])
-        elif key[1] == 'k':
-            scores_dict[key] = kiwi_score(images_dict[key][0])
+        if key.startswith('10'):
+            if key[2] == 'a':
+                scores_dict[key] = apple_score(images_dict[key][0])
+            elif key[2] == 'b':
+                score = banana_score(images_dict[key][0])
+                scores_dict[key] = score
+                # print(key, score)
+            elif key[2] == 'o':
+                continue
+                scores_dict[key] = orange_score(images_dict[key])
+            elif key[2] == 'p':
+                scores_dict[key] = pear_score(images_dict[key][0])
+            elif key[2] == 'm':
+                scores_dict[key] = mango_score(images_dict[key][0])
+            elif key[2] == 'k':
+                scores_dict[key] = kiwi_score(images_dict[key][0])
+            else:
+                print("Error: Invalid fruit type")
         else:
-            print("Error: Invalid fruit type")
+            if key[1] == 'a':
+                scores_dict[key] = apple_score(images_dict[key][0])
+            elif key[1] == 'b':
+                score = banana_score(images_dict[key][0])
+                scores_dict[key] = score
+                # print(key, score)
+            elif key[1] == 'o':
+                continue
+                scores_dict[key] = orange_score(images_dict[key])
+            elif key[1] == 'p':
+                scores_dict[key] = pear_score(images_dict[key][0])
+            elif key[1] == 'm':
+                scores_dict[key] = mango_score(images_dict[key][0])
+            elif key[1] == 'k':
+                scores_dict[key] = kiwi_score(images_dict[key][0])
+            else:
+                print("Error: Invalid fruit type")
+
     return scores_dict
 
 

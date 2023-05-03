@@ -1,6 +1,8 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+import math
+
 
 import os
 import sys
@@ -25,9 +27,13 @@ def banana_score(path, display = False):
     blemish_score = min(blemish_score * 3, 1)
 
     # take blemish value add it to 1 and square it
-    blemish_score = (blemish_score + 1) ** 2
+    blemish_score = ((blemish_score + 1) ** 2)  - 1
 
-    return min(blemish_score-1, 1)
+    # if blemish_score < 0.04:
+    #     if blemish_score == 0:
+    #         return 0.09
+    #     return blemish_score * 7
+    return min(blemish_score, 1)
 
 
 # for i in range(1, 11):

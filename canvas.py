@@ -43,3 +43,4 @@ def get_canvas(img_dict, fruit):
     cv2.imshow('Canvas', canvas)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+

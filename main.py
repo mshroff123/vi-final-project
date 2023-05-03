@@ -19,7 +19,7 @@ def get_crowd_data(file_path):
             day = int((int(number) - 13) / 2)
             days_list = []
             score_list = []
-            csv_file.seek(0)  # move file pointer back to beginning of file
+            csv_file.seek(0)    # move file pointer back to beginning of file
             next(csv_reader)
             for row in csv_reader:
                 row = row[1:]
@@ -55,6 +55,8 @@ def train(mock_dict):
         days = [int(d) for d, _ in data]
         scores = [s for _, s in data]
         slope, intercept, _, _, _ = linregress(days, scores)
+        if intercept < 0:
+            intercept = 0
         line = [slope * day + intercept for day in days]
         ax.plot(days, line, label=fruit)
         fruit_lines[fruit] = line
@@ -68,8 +70,10 @@ def train(mock_dict):
             days.append(int(key[0]))
         scores.append(value)
     slope, intercept, _, _, _ = linregress(days, scores)
+    if intercept < 0:
+        intercept = 0
     line = [slope * day + intercept for day in days]
-    fruit_lines['average'] = line
+    fruit_lines['average'] = (slope, intercept, line)
     ax.plot(days, line, label='average')
 
     ax.set_xlabel('Days')
@@ -84,16 +88,18 @@ def train(mock_dict):
 
 def test(fruit_lines, mock_dict):
     # Compute the average line
-    total_slope, total_intercept = 0, 0
-    for line in fruit_lines.values():
-        slope, intercept = linregress(range(1, 11), line[:10])[:2]
-        total_slope += slope
-        total_intercept += intercept
-    avg_slope, avg_intercept = total_slope / len(fruit_lines), total_intercept / len(fruit_lines)
+    # total_slope, total_intercept = 0, 0
+    # for line in fruit_lines.values():
+    #     slope, intercept = linregress(range(1, 11), line[:10])[:2]
+    #     total_slope += slope
+    #     total_intercept += intercept
+    # avg_slope, avg_intercept = total_slope / len(fruit_lines), total_intercept / len(fruit_lines)
+
+    avg_slope, avg_intercept, avg_line = fruit_lines['average']
     avg_line = [avg_slope * day + avg_intercept for day in range(1, 11)]
     
     # Compute the vertical distances and plot the graphs
-    for fruit in set(key[1:-1] for key in mock_dict.keys() if key[-1] == '3'):
+    for fruit in set(''.join(filter(str.isalpha, key[1:])) for key in mock_dict.keys() if key.endswith('3')):
         fig, ax = plt.subplots()
         ax.plot(range(1, 11), avg_line, label='average')
         total_distance = 0
@@ -122,12 +128,12 @@ def test(fruit_lines, mock_dict):
 
 
 img_dict = get_image_dict()
-#score_dict = get_scores_dict(img_dict)
+score_dict = get_scores_dict(img_dict)
 
 
 
 
-get_canvas(img_dict, 'mango')
+#get_canvas(img_dict, 'mango')
 
 # # Create an empty dictionary to store the updated entries
 # score_dict = defaultdict(list)
@@ -157,8 +163,8 @@ mock_dict = {}
 
 
 
-# lines = train(score_dict)
-# total_distance = test(lines, score_dict)
+lines = train(score_dict)
+total_distance = test(lines, score_dict)
 
 
 # total_distance = calculate_vertical_distance(mock_dict, lines)
