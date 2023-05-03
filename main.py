@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import csv
 from scipy.stats import linregress
 from collections import defaultdict
 
@@ -54,8 +55,8 @@ def get_crowd_data(file_path):
 
             avg_score = round((sum(score_list))/6, 2)
             avg_day = round((sum(days_list))/6)
-            key = str(days) + fruit_type + "3"
-            crowd_dict[key] = {"days": avg_day, "ripeness": avg_score}
+            key = str(day) + fruit_type + "3"
+            crowd_dict[key] = {"ground_day": day, "crowd_days": avg_day, "ripeness": avg_score}
 
     # print(f'Banana Crowd Accuracy: {banana_accuracy/each_fruit:.4f}')
     # print(f'Mango Crowd Accuracy: {mango_accuracy/each_fruit:.4f}')
@@ -143,14 +144,13 @@ def test(fruit_lines, mock_dict):
                 else:
                     day = int(key[0])
                 avg_value = avg_slope * day + avg_intercept
-                dist = abs(value - (avg_slope * day + avg_intercept))
+                dist = abs(value - avg_value)
                 total_distance += dist
                 # if value is less than the average line, plot a green line
-                if value < avg_slope * day + avg_intercept:
-                    ax.axvline(x=day, ymin=value, ymax=value, color='red', linestyle='--')
-
-
-                ax.axvline(x=day, ymin=0, ymax=value, color='red', linestyle='--')
+                if value < avg_value:
+                    ax.axvline(x=day, ymin=value, ymax=avg_value, color='red', linestyle='--')
+                else:
+                    ax.axvline(x=day, ymin=avg_value, ymax=value, color='red', linestyle='--')
 
         ax.set_xlabel('Days')
         ax.set_ylim(0, 1)
@@ -164,11 +164,11 @@ def test(fruit_lines, mock_dict):
 
 
 img_dict = get_image_dict()
-score_dict = get_scores_dict(img_dict)
+#score_dict = get_scores_dict(img_dict)
 crowd_dict = get_crowd_data("fruitcsv.csv")
 
 
-lines = train(score_dict)
-total_distance = test(lines, score_dict)
+#lines = train(score_dict)
+#total_distance = test(lines, score_dict)
 
 
