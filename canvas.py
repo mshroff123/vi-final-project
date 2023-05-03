@@ -10,7 +10,7 @@ Canvas is of size # of Days x 3
 def get_canvas(img_dict, fruit):
     # produce list of image keys
     img_keys = []
-    for i in range(1,8):
+    for i in range(1,11):
         img_keys.append(str(i) + fruit + '3')
 
     # size of the thumbnails
@@ -22,7 +22,7 @@ def get_canvas(img_dict, fruit):
     canvas = np.zeros((canvas_size[1], canvas_size[0], 3), dtype=np.uint8)
 
     # Iterate over rows
-    for row in range(7):
+    for row in range(10):
         # Iterate over columns
         for col in range(num_cols):
             # Calculate index into list of image keys

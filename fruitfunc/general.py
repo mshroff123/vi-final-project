@@ -5,6 +5,7 @@ from PIL import Image
 from collections import defaultdict
 from scipy.ndimage import laplace
 
+
 """
 CONTOUR FOR COLOR/TEXTURE: 
 Reads in the image, gets a contour for the fruit
@@ -169,13 +170,8 @@ def blemishes_score(img, LOW, UP):
     # convert image to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # display grayscale image using cv2
-    cv2.imshow('image', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
     # calculate total number of pixels within object
-    total_pixels = cv2.countNonZero(gray)
+    total_pixels = np.sum(gray != 255)
 
     # threshold the image
     _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
@@ -191,17 +187,17 @@ def blemishes_score(img, LOW, UP):
     mask = cv2.inRange(hsv, lower, upper)
     result = cv2.bitwise_and(img, img, mask=mask)
 
-    # display image with mask using cv2
-    cv2.imshow('image', result)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # # display image with mask using cv2
+    # cv2.imshow('Result', result)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     # apply mask to the thresholded image
-    blemish_pixels = cv2.countNonZero(cv2.bitwise_and(thresh, thresh, mask=mask))
+    blemish_pixels = cv2.countNonZero(cv2.cvtColor(result, cv2.COLOR_BGR2GRAY))
 
     # calculate the blemish score as the ratio of blemish pixels to total pixels
     blemish_score = blemish_pixels / total_pixels
-    print(blemish_score)
+
 
     return blemish_score
 

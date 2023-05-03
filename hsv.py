@@ -1,11 +1,16 @@
 import cv2
 import numpy as np
 
+from fruitfunc.general import background_to_white, process_image
+
 def nothing(x):
     pass
 
 # Load image
-image = cv2.imread('/Users/jay/Desktop/Project Fruit/Day1/mango2.JPG')
+image = cv2.imread('/Users/jay/Desktop/Project Fruit/Day6/kiwi2.JPG')
+image = process_image(image)
+image = background_to_white(image)
+
 
 # Create a window
 cv2.namedWindow('image')

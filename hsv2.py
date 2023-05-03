@@ -1,5 +1,8 @@
 import cv2
 import numpy as np
+
+from fruitfunc.general import background_to_white, process_image
+
  
  
 def mousehsv(event,x,y,flags,param):
@@ -17,7 +20,9 @@ def mousehsv(event,x,y,flags,param):
         print("BRG Format: ",colors)
         print("Coordinates of pixel: X: ",x,"Y: ",y)
  
-image = cv2.imread('/Users/jay/Desktop/Project Fruit/Day1/mango2.JPG')
+image = cv2.imread('/Users/jay/Desktop/Project Fruit/Day10/kiwi3.JPG')
+image = process_image(image)
+image = background_to_white(image)
 cv2.namedWindow('mouseRGB')
 cv2.setMouseCallback('mouseRGB',mousehsv)
  
